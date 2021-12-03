@@ -35,4 +35,30 @@ async function downVote(id) {
   return result.rows;
 }
 
-export { newRecommendation, upVote, checkScore, deleteRecom, downVote };
+async function getAllRecom() {
+  const result = await connection.query("SELECT * FROM recommendations;");
+  return result.rows;
+}
+
+async function greater() {
+  const result = await connection.query("SELECT * FROM recommendations WHERE score > 10;");
+  return result.rows;
+}
+
+async function lower() {
+  const result = await connection.query(
+    "SELECT * FROM recommendations WHERE score >= -5 AND score <= 10;"
+  );
+  return result.rows;
+}
+
+export {
+  newRecommendation,
+  upVote,
+  checkScore,
+  deleteRecom,
+  downVote,
+  getAllRecom,
+  greater,
+  lower,
+};

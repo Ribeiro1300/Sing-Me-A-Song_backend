@@ -32,11 +32,12 @@ async function upVote(req, res) {
     res.sednStatus(500);
   }
 }
+
 async function downVote(req, res) {
   const { id } = req.body;
   try {
     const result = await recomService.downVote(id);
-    if (!result) {
+    if (result) {
       res.status(404);
     }
   } catch (error) {
@@ -44,4 +45,21 @@ async function downVote(req, res) {
     res.sednStatus(500);
   }
 }
-export { newRecommendation, upVote, downVote };
+
+// eslint-disable-next-line no-unused-vars
+async function random(req, res) {
+  try {
+    const result = await recomService.random();
+
+    if (result === "Nenhuma recomendação encontrada") {
+      res.sendStatus(404);
+    }
+
+    res.status(201).send(result);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export { newRecommendation, upVote, downVote, random };
