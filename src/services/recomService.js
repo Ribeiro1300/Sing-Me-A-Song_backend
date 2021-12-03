@@ -30,4 +30,31 @@ async function downVote(id) {
   return result.length === 0 ? null : result;
 }
 
-export { newRecommendation, upVote, downVote };
+async function random(fixedChance = null) {
+  // 5 saidas possiveis
+  const allRecom = await recomRepository.getAllRecom();
+
+  if (allRecom.length === 0) {
+    return "Nenhuma recomendação encontrada";
+  }
+
+  const lowerThanTen = allRecom.filter((info) => info.score <= 10);
+  const greaterThanTen = allRecom.filter((info) => info.score > 10);
+
+  if (lowerThanTen.length === 0) {
+    fixedChance = -50;
+  } else if (greaterThanTen.length === 0) {
+    fixedChance = 150;
+  }
+
+  const chance = fixedChance || Math.floor(Math.random() * 100);
+
+  const recoms = chance >= 70 ? await recomRepository.lower() : await recomRepository.greater();
+
+  const randomRecom = Math.floor(Math.random() * recoms.length);
+  const result = recoms[randomRecom];
+
+  return { result, chance };
+}
+
+export { newRecommendation, upVote, downVote, random };

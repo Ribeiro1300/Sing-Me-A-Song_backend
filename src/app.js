@@ -9,4 +9,10 @@ app.use(cors());
 
 app.post("/recommendations", recomController.newRecommendation);
 
+app.post("/recommendations/:id/upvote", recomController.upVote);
+
+app.post("/recommendations/:id/downvote", recomController.downVote);
+
+app.get("/random", recomController.random);
+
 export default app;
