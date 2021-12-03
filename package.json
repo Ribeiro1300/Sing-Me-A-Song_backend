@@ -5,8 +5,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node ./src/server.js",
-    "test": "npx jest"
+    "start": "nodemon ./src/server.js",
+    "test": "npx jest",
+    "testWatch": "npx jest --watch",
+    "coverage":"npx jest -i --coverage"
   },
   "author": "",
   "license": "ISC",

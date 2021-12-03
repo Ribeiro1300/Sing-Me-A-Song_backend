@@ -8,4 +8,31 @@ async function newRecommendation(name, youtubeLink) {
   return result.rows;
 }
 
-export { newRecommendation };
+async function upVote(id) {
+  const score = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
+  const result = await connection.query("UPDATE recommendations SET score=$1 WHERE id=$2;", [
+    Number(score) + 1,
+    id,
+  ]);
+  return result.rows;
+}
+
+async function checkScore(id) {
+  const score = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
+  return Number(score);
+}
+
+async function deleteRecom(id) {
+  await connection.query("DELETE FROM recommendations WHERE id=$1;", [id]);
+}
+
+async function downVote(id) {
+  const score = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
+  const result = await connection.query("UPDATE recommendations SET score=$1 WHERE id=$2;", [
+    Number(score) - 1,
+    id,
+  ]);
+  return result.rows;
+}
+
+export { newRecommendation, upVote, checkScore, deleteRecom, downVote };
