@@ -50,29 +50,29 @@ describe("POST /recommendations", () => {
 });
 
 describe("POST /recommendations/:id/upvote", () => {
-  const test = jest.spyOn(recomRepository, "upVote");
+  const vote = jest.spyOn(recomRepository, "upVote");
   const mockUserId = 1;
 
   it("Should be a truthy for valid id and no repository error", async () => {
-    test.mockImplementation(() => {
+    vote.mockImplementation(() => {
       return ["Tudo certo"];
     });
     const result = await recomService.upVote(mockUserId);
     expect(result).toBeTruthy();
   });
-  it("Should be null for invalid id or repository error", async () => {
-    test.mockImplementation(() => {
-      return [];
+  it("Should return 'ID inválido' for invalid id or repository error", async () => {
+    vote.mockImplementation(() => {
+      return "ID inválido";
     });
     const result = await recomService.upVote(mockUserId);
-    expect(result).toBeNull();
+    expect(result).toEqual("ID inválido");
   });
 });
 
 describe("POST /recommendations/:id/downvote", () => {
   const mockScore = jest.spyOn(recomRepository, "checkScore");
   const mockDelete = jest.spyOn(recomRepository, "deleteRecom");
-  const test = jest.spyOn(recomRepository, "downVote");
+  const vote = jest.spyOn(recomRepository, "downVote");
   const mockUserId = 1;
 
   it("Should be a truthy for valid id and no repository error", async () => {
@@ -82,25 +82,25 @@ describe("POST /recommendations/:id/downvote", () => {
     mockDelete.mockImplementation(() => {
       return "ok";
     });
-    test.mockImplementation(() => {
+    vote.mockImplementation(() => {
       return ["Tudo certo"];
     });
     const result = await recomService.downVote(mockUserId);
     expect(result).toBeTruthy();
   });
 
-  it("Should be null for invalid id or repository error", async () => {
+  it("Should return 'ID inválido' for invalid id or repository error", async () => {
     mockScore.mockImplementation(() => {
       return 10;
     });
     mockDelete.mockImplementation(() => {
       return "ok";
     });
-    test.mockImplementation(() => {
-      return [];
+    vote.mockImplementation(() => {
+      return "ID inválido";
     });
     const result = await recomService.downVote(mockUserId);
-    expect(result).toBeNull();
+    expect(result).toEqual("ID inválido");
   });
 
   it("Should return 'Pontuação excluída' for score equal to -5 ", async () => {
@@ -116,7 +116,7 @@ describe("POST /recommendations/:id/downvote", () => {
 });
 
 describe("GET /random", () => {
-  const allRecoms = jest.spyOn(recomRepository, "getAllRecom");
+  const allRecoms = jest.spyOn(recomRepository, "getAllRecoms");
   const greaterChance = jest.spyOn(recomRepository, "greater");
   const lowerChance = jest.spyOn(recomRepository, "lower");
 
@@ -174,7 +174,44 @@ describe("GET /random", () => {
   });
 });
 
+describe("GET /recommendations/top/:amount", () => {
+  const allRecoms = jest.spyOn(recomRepository, "getAllRecoms");
+  const topRecoms = jest.spyOn(recomRepository, "topRecoms");
+  const mockLimit = 3;
+  it("Should return 'Nenhuma recomendação encontrada' for empty table", async () => {
+    allRecoms.mockImplementation(() => {
+      return [];
+    });
+
+    const result = await recomService.topRecoms(mockLimit);
+    expect(result).toEqual("Nenhuma recomendação encontrada");
+  });
+  it("Should return a result and message for limit greater than the total of recommendations", async () => {
+    allRecoms.mockImplementation(() => {
+      return [1, 2];
+    });
+    topRecoms.mockImplementation(() => {
+      return [1, 2];
+    });
+
+    const result = await recomService.topRecoms(mockLimit);
+    expect(result.message).not.toBeUndefined();
+  });
+  it("Should return only a result for limit within the number of recommendations", async () => {
+    allRecoms.mockImplementation(() => {
+      return [1, 2, 3, 4, 5];
+    });
+
+    topRecoms.mockImplementation(() => {
+      return [1, 2, 3];
+    });
+
+    const result = await recomService.topRecoms(mockLimit);
+
+    expect(result).toEqual({ result: [1, 2, 3] });
+  });
+});
+
 afterAll(async () => {
-  await connection.query("DELETE FROM recommendations;");
   connection.end();
 });
