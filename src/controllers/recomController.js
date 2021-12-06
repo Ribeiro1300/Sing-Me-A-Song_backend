@@ -21,28 +21,33 @@ async function newRecommendation(req, res) {
 }
 
 async function upVote(req, res) {
-  const { id } = req.body;
   try {
+    const { id } = req.body;
+
     const result = await recomService.upVote(id);
-    if (!result) {
-      res.status(404);
+
+    if (result === "ID inválido") {
+      res.status(404).send("ID inválido");
     }
+    res.send(201);
   } catch (error) {
-    console.log();
-    res.sednStatus(500);
+    console.log(error);
+    res.sendStatus(500);
   }
 }
 
 async function downVote(req, res) {
-  const { id } = req.body;
   try {
+    const { id } = req.body;
+
     const result = await recomService.downVote(id);
-    if (result) {
-      res.status(404);
+    if (result === "ID inválido") {
+      res.status(404).send("ID inválido");
     }
+    res.send(201);
   } catch (error) {
-    console.log();
-    res.sednStatus(500);
+    console.log(error);
+    res.sendStatus(500);
   }
 }
 
@@ -62,4 +67,23 @@ async function random(req, res) {
   }
 }
 
-export { newRecommendation, upVote, downVote, random };
+async function topRecoms(req, res) {
+  try {
+    const { ammout } = req.body;
+
+    const topRecoms = await recomService.topRecoms(ammout);
+
+    if (topRecoms === "Nenhuma recomendação encontrada") {
+      res.sendStatus(404);
+    } else if (topRecoms.message) {
+      res.status(202).send(topRecoms.result, topRecoms.message);
+    }
+
+    res.status(201).send(topRecoms.result);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export { newRecommendation, upVote, downVote, random, topRecoms };

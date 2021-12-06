@@ -10,6 +10,11 @@ async function newRecommendation(name, youtubeLink) {
 
 async function upVote(id) {
   const score = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
+
+  if (score.rows === 0) {
+    return "ID inválido";
+  }
+
   const result = await connection.query("UPDATE recommendations SET score=$1 WHERE id=$2;", [
     Number(score) + 1,
     id,
@@ -28,6 +33,11 @@ async function deleteRecom(id) {
 
 async function downVote(id) {
   const score = await connection.query("SELECT score FROM recommendations WHERE id = $1", [id]);
+
+  if (score.rows === 0) {
+    return "ID inválido";
+  }
+
   const result = await connection.query("UPDATE recommendations SET score=$1 WHERE id=$2;", [
     Number(score) - 1,
     id,
@@ -35,7 +45,7 @@ async function downVote(id) {
   return result.rows;
 }
 
-async function getAllRecom() {
+async function getAllRecoms() {
   const result = await connection.query("SELECT * FROM recommendations;");
   return result.rows;
 }
@@ -52,13 +62,21 @@ async function lower() {
   return result.rows;
 }
 
+async function topRecoms(limit) {
+  const result = await connection.query("SELECT * FROM recommendations ORDER BY score LIMIT $1", [
+    limit,
+  ]);
+  return result.rows;
+}
+
 export {
   newRecommendation,
   upVote,
   checkScore,
   deleteRecom,
   downVote,
-  getAllRecom,
+  getAllRecoms,
   greater,
   lower,
+  topRecoms,
 };

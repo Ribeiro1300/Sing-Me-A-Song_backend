@@ -15,7 +15,7 @@ async function newRecommendation(name, youtubeLink) {
 
 async function upVote(id) {
   const result = await recomRepository.upVote(id);
-  return result.length === 0 ? null : result;
+  return result === "ID inválido" ? "ID inválido" : result;
 }
 
 async function downVote(id) {
@@ -27,12 +27,12 @@ async function downVote(id) {
   }
 
   const result = await recomRepository.downVote(id);
-  return result.length === 0 ? null : result;
+  return result === "ID inválido" ? "ID inválido" : result;
 }
 
 async function random(fixedChance = null) {
   // 5 saidas possiveis
-  const allRecom = await recomRepository.getAllRecom();
+  const allRecom = await recomRepository.getAllRecoms();
 
   if (allRecom.length === 0) {
     return "Nenhuma recomendação encontrada";
@@ -57,4 +57,22 @@ async function random(fixedChance = null) {
   return { result, chance };
 }
 
-export { newRecommendation, upVote, downVote, random };
+async function topRecoms(limit) {
+  const allRecom = await recomRepository.getAllRecoms();
+
+  if (allRecom.length === 0) {
+    return "Nenhuma recomendação encontrada";
+  }
+
+  const result = await recomRepository.topRecoms(limit);
+
+  if (allRecom.length < limit) {
+    const message =
+      "Sinto muito, mas ainda não temos tantas recomendações. Essas são todas as que possuímos por enquanto, aproveite";
+    return { result, message };
+  }
+
+  return { result };
+}
+
+export { newRecommendation, upVote, downVote, random, topRecoms };

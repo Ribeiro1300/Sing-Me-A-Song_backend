@@ -15,4 +15,6 @@ app.post("/recommendations/:id/downvote", recomController.downVote);
 
 app.get("/random", recomController.random);
 
+app.get("/recommendations/top/:amount", recomController.topRecoms);
+
 export default app;
